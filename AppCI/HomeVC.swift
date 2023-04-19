@@ -12,6 +12,7 @@ class HomeVC: UIViewController {
     @IBOutlet weak var numberLabel: UILabel!
     
     var number = 8
+    var name = "Continuous"
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,6 +25,10 @@ class HomeVC: UIViewController {
     
     func setNumber() -> Int {
         self.number * 3
+    }
+    
+    func getNameSize() -> Int {
+        self.name.count
     }
 
 }
