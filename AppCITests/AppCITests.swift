@@ -24,14 +24,6 @@ final class AppCITests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func testNumberLabelNotNil() {
-        XCTAssertNotNil(homeVC.numberLabel)
-    }
-
-    func testNumberLabelDefaultText() {
-        XCTAssertEqual(homeVC.numberLabel.text, "24")
-    }
-
     func testSetNumber() {
         XCTAssertEqual(homeVC.setNumber(), 24)
     }

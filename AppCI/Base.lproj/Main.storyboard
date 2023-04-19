@@ -42,7 +42,7 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="numberLabel" destination="0Ai-gw-lla" id="RV3-Is-2bq"/>
+                        <outlet property="numberLabel" destination="0Ai-gw-lla" id="End-Ea-yLX"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
