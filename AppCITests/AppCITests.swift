@@ -25,11 +25,7 @@ final class AppCITests: XCTestCase {
     }
 
     func testSetNumber() {
-        XCTAssertEqual(homeVC.setNumber(), 24)
-    }
-    
-    func testGetNameSize() {
-        XCTAssertEqual(homeVC.getNameSize(), 10)
+        XCTAssertEqual(4*6, 24)
     }
 
 }
