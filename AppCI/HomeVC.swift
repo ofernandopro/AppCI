@@ -16,12 +16,7 @@ class HomeVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        //setupDesign()
     }
-    
-//    func setupDesign() {
-//        numberLabel.text = String(setNumber())
-//    }
     
     func setNumber() -> Int {
         self.number * 3
