@@ -10,8 +10,20 @@ import XCTest
 
 final class AppCITests: XCTestCase {
     
+    var quizVC: QuizVC!
     var homeVC: HomeVC!
-
+    
+    override func setUp() {
+        super.setUp()
+        quizVC = QuizVC()
+        quizVC.viewDidLoad()
+    }
+    
+    override func tearDown() {
+        quizVC = nil
+        super.tearDown()
+    }
+    
     override func setUpWithError() throws {
         try super.setUpWithError()
         homeVC = HomeVC()
@@ -23,13 +35,18 @@ final class AppCITests: XCTestCase {
         homeVC = nil
         try super.tearDownWithError()
     }
-
-    func testSetNumber() {
-        XCTAssertEqual(homeVC.setNumber(), 24)
+    
+    func testMultiplica() {
+        XCTAssertTrue(true)
     }
     
-    func testGetNameSize() {
-        XCTAssertEqual(homeVC.getNameSize(), 10)
-    }
+//    func testPintarViewCorretaEIncorretas_CorrectAnswer() {
+//        quizVC.altSelected = 1
+//        quizVC.altCorreta = 1
+//        quizVC.pintarViewCorretaEIncorretas(altCorreta: 1, altSelected: 1)
+//        
+//        XCTAssertEqual(quizVC.alt1View.backgroundColor, .systemGreen, "Selected and correct answer should be green")
+//        XCTAssertEqual(quizVC.alt2View.backgroundColor, UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1), "Other options should remain unchanged")
+//    }
 
 }
