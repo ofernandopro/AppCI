@@ -16,5 +16,5 @@ struct Pergunta {
     var alt4: String
     var altCorreta: Int
     var nivel: Int
-    var areaConhecimento: String
+    var areaConhecimento: Int // 0 -> Humanas, 1 -> Naturezas, 2 -> Exatas, 3 -> Geral
 }

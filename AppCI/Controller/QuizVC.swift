@@ -7,51 +7,23 @@
 
 import UIKit
 
-class QuizVC: UIViewController, EliminarAltsVCDelegate {
+class QuizVC: UIViewController {
     
-    func getQntAltsEliminadas(qntAltsEliminadas: Int) {
-        self.qntAltsEliminadas = qntAltsEliminadas
-        
-        print("0111 qntAltsEliminadas \(qntAltsEliminadas)")
-        
-        if qntAltsEliminadas == 0 {
-            return
-        }
-        
-        var altsQuePodemSerEliminadas: [Int] = []
-        
-        for i in 1...4 {
-            if i != altCorreta {
-                altsQuePodemSerEliminadas.append(i)
-            }
-        }
-        
-        print("0111 altsQuePodemSerEliminadas \(altsQuePodemSerEliminadas)")
-        
-        for _ in 0..<qntAltsEliminadas {
-            print("0111 randomElement \(altsQuePodemSerEliminadas.randomElement() ?? 0)")
-            let altEliminada = altsQuePodemSerEliminadas.randomElement() ?? 0
-            altsQuePodemSerEliminadas = altsQuePodemSerEliminadas.filter { $0 != altEliminada }
-            print("0111 altsQuePodemSerEliminadas \(altsQuePodemSerEliminadas)")
-            eliminateAlt(alt: altEliminada)
-        }
-        
-        eliminarAltsView.backgroundColor = .systemGray
-        eliminarAltsView.isUserInteractionEnabled = false
-        
-    }
+    // MARK: - Properties
     
-    func eliminateAlt(alt: Int) {
-        if alt == 1 {
-            alt1View.isHidden = true
-        } else if alt == 2 {
-            alt2View.isHidden = true
-        } else if alt == 3 {
-            alt3View.isHidden = true
-        } else if alt == 4 {
-            alt4View.isHidden = true
-        }
-    }
+    var altSelected: Int = 0
+    var numPergunta = 0
+    var altCorreta: Int = 0
+    var pergunta: Pergunta?
+    var viewModel: QuizViewModel = QuizViewModel()
+    var valoresPerguntas = [500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 300000, 400000, 500000, 1000000]
+    var randomInt: Int?
+    var foiRespondida: Bool = false
+    var respostaErrada = false
+    var qntAltsEliminadas: Int = 0
+    var customGray: UIColor = UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1)
+    
+    // MARK: - Outlets and Actions
     
     @IBOutlet weak var startButton: UIButton!
     @IBOutlet weak var pararButton: UIButton!
@@ -61,33 +33,16 @@ class QuizVC: UIViewController, EliminarAltsVCDelegate {
     @IBOutlet weak var alt3Label: UILabel!
     @IBOutlet weak var alt4Label: UILabel!
     @IBOutlet weak var pontuacaoLabel: UILabel!
-    
     @IBOutlet weak var startButtonBottomConstraint: NSLayoutConstraint!
-
     @IBOutlet weak var resultadoLabel: UILabel!
-    
     @IBOutlet weak var alt1View: UIView!
     @IBOutlet weak var alt2View: UIView!
     @IBOutlet weak var alt3View: UIView!
     @IBOutlet weak var alt4View: UIView!
-    
     @IBOutlet weak var eliminarAltsView: UIView!
     @IBOutlet weak var universitariosView: UIView!
-    
-    var altSelected: Int = 0
-    var pontuacaoNesteJogo = 0
-    var numPergunta = 0
-    var altCorreta: Int = 0
-    
-    var viewModel: QuizViewModel = QuizViewModel()
-    
-    var valoresPerguntas = [500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 300000, 400000, 500000, 1000000]
-    
-    var randomInt: Int?
-    var foiRespondida: Bool = false
-    var respostaErrada = false
-    
-    var qntAltsEliminadas: Int = 0
+    @IBOutlet weak var eliminarAltsImageView: UIImageView!
+    @IBOutlet weak var universitariosImageView: UIImageView!
     
     @IBAction func onTapSubmitButton(_ sender: Any) {
         
@@ -104,7 +59,6 @@ class QuizVC: UIViewController, EliminarAltsVCDelegate {
         if !foiRespondida {
             
             if altSelected == altCorreta {
-                pontuacaoNesteJogo += viewModel.perguntas[altCorreta-1].nivel * 20
                 let valor = NumberFormatter.localizedString(from: NSNumber(value: valoresPerguntas[numPergunta]), number: .currency)
                 resultadoLabel.text = "Resposta Correta! Você já ganhou \(valor) 😀"
                 resultadoLabel.textColor = .systemGreen
@@ -175,43 +129,11 @@ class QuizVC: UIViewController, EliminarAltsVCDelegate {
         }
     }
     
-    func showAlert(title: String, message: String) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
-
-        alert.addAction(UIAlertAction(title: "Sim", style: .default, handler: { (action: UIAlertAction!) in
-            self.irParaParabensVC()
-          }))
-
-        alert.addAction(UIAlertAction(title: "Não", style: .cancel, handler: { (action: UIAlertAction!) in
-//            self.dismiss(animated: true)
-          }))
-
-        present(alert, animated: true, completion: nil)
-    }
-    
-    func irParaParabensVC() {
-        let storyBoard = UIStoryboard(name: "Main", bundle: .main)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "ParabensVC") as! ParabensVC
-        vc.modalPresentationStyle = .fullScreen
-        if respostaErrada {
-            if numPergunta > 0 {
-                vc.valorGanho = valoresPerguntas[numPergunta-1]
-            } else {
-                vc.valorGanho = 0
-            }
-        } else {
-            if numPergunta > 0 {
-                vc.valorGanho = valoresPerguntas[numPergunta-1]
-            } else {
-                vc.valorGanho = 0
-            }
-        }
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         self.navigationController?.isNavigationBarHidden = true
         resultadoLabel.isHidden = true
         let valor = NumberFormatter.localizedString(from: NSNumber(value: valoresPerguntas[numPergunta]), number: .currency)
@@ -224,89 +146,36 @@ class QuizVC: UIViewController, EliminarAltsVCDelegate {
         addTapGestures()
     }
     
+    // MARK: - Methods
+    
     func sortearPergunta() {
-//        let antigoSorteado = self.randomInt
-//        var randomInt = 0
-//        repeat {
-        var randomInt = Int.random(in: 0..<viewModel.perguntas.count)
-//        } while randomInt != antigoSorteado
-        self.randomInt = randomInt
+        let numPergunta = viewModel.getPerguntaPorNivel(numPergunta: numPergunta)
+        self.randomInt = numPergunta
         
-        self.altCorreta = viewModel.perguntas[randomInt].altCorreta
+        self.altCorreta = viewModel.perguntas[numPergunta].altCorreta
+        self.pergunta = viewModel.perguntas[numPergunta]
         
-        perguntaLabel.text = "\(viewModel.perguntas[randomInt].pergunta)"
-        alt1Label.text = "\(viewModel.perguntas[randomInt].alt1)"
-        alt2Label.text = "\(viewModel.perguntas[randomInt].alt2)"
-        alt3Label.text = "\(viewModel.perguntas[randomInt].alt3)"
-        alt4Label.text = "\(viewModel.perguntas[randomInt].alt4)"
+        perguntaLabel.text = "\(viewModel.perguntas[numPergunta].pergunta)"
+        alt1Label.text = "\(viewModel.perguntas[numPergunta].alt1)"
+        alt2Label.text = "\(viewModel.perguntas[numPergunta].alt2)"
+        alt3Label.text = "\(viewModel.perguntas[numPergunta].alt3)"
+        alt4Label.text = "\(viewModel.perguntas[numPergunta].alt4)"
     }
     
     func reiniciarCores() {
-        alt1View.backgroundColor = UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1)
-        alt2View.backgroundColor = UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1)
-        alt3View.backgroundColor = UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1)
-        alt4View.backgroundColor = UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1)
+        alt1View.backgroundColor = customGray
+        alt2View.backgroundColor = customGray
+        alt3View.backgroundColor = customGray
+        alt4View.backgroundColor = customGray
     }
     
     func addTapGestures() {
         alt1View.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTapAlt1View)))
-        
         alt2View.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTapAlt2View)))
-        
         alt3View.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTapAlt3View)))
-        
         alt4View.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTapAlt4View)))
-        
         eliminarAltsView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTapEliminarAltsView)))
-        
         universitariosView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTapUniversitariosView)))
-    }
-    
-    @objc func onTapAlt1View() {
-        altSelected = 1
-        
-        alt1View.backgroundColor = UIColor.lightGray
-        alt2View.backgroundColor = UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1)
-        alt3View.backgroundColor = UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1)
-        alt4View.backgroundColor = UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1)
-    }
-    
-    @objc func onTapAlt2View() {
-        altSelected = 2
-        
-        alt1View.backgroundColor = UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1)
-        alt2View.backgroundColor = UIColor.lightGray
-        alt3View.backgroundColor = UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1)
-        alt4View.backgroundColor = UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1)
-    }
-    
-    @objc func onTapAlt3View() {
-        altSelected = 3
-        
-        alt1View.backgroundColor = UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1)
-        alt2View.backgroundColor = UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1)
-        alt3View.backgroundColor = UIColor.lightGray
-        alt4View.backgroundColor = UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1)
-    }
-    
-    @objc func onTapAlt4View() {
-        altSelected = 4
-        
-        alt1View.backgroundColor = UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1)
-        alt2View.backgroundColor = UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1)
-        alt3View.backgroundColor = UIColor(red: 66/255, green: 66/255, blue: 66/255, alpha: 1)
-        alt4View.backgroundColor = UIColor.lightGray
-    }
-    
-    @objc func onTapEliminarAltsView() {
-        let storyBoard = UIStoryboard(name: "Main", bundle: .main)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "EliminarAltsVC") as! EliminarAltsVC
-        vc.delegate = self
-        present(vc, animated: true)
-    }
-    
-    @objc func onTapUniversitariosView() {
-        
     }
     
     func pintarViewCorretaEIncorretas(altCorreta: Int, altSelected: Int) {
@@ -362,6 +231,142 @@ class QuizVC: UIViewController, EliminarAltsVCDelegate {
         }
 
     }
+    
+    func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
+
+        alert.addAction(UIAlertAction(title: "Sim", style: .default, handler: { (action: UIAlertAction!) in
+            self.irParaParabensVC()
+          }))
+
+        alert.addAction(UIAlertAction(title: "Não", style: .cancel, handler: { (action: UIAlertAction!) in
+          }))
+
+        present(alert, animated: true, completion: nil)
+    }
+    
+    func irParaParabensVC() {
+        let storyBoard = UIStoryboard(name: "Main", bundle: .main)
+        let vc = storyBoard.instantiateViewController(withIdentifier: "ParabensVC") as! ParabensVC
+        vc.modalPresentationStyle = .fullScreen
+        if respostaErrada {
+            if numPergunta > 0 {
+                vc.valorGanho = valoresPerguntas[numPergunta-1]
+            } else {
+                vc.valorGanho = 0
+            }
+        } else {
+            if numPergunta > 0 {
+                vc.valorGanho = valoresPerguntas[numPergunta-1]
+            } else {
+                vc.valorGanho = 0
+            }
+        }
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    // MARK: - Objc Methods
+    
+    @objc func onTapAlt1View() {
+        altSelected = 1
+        alt1View.backgroundColor = UIColor.lightGray
+        alt2View.backgroundColor = customGray
+        alt3View.backgroundColor = customGray
+        alt4View.backgroundColor = customGray
+    }
+    
+    @objc func onTapAlt2View() {
+        altSelected = 2
+        alt1View.backgroundColor = customGray
+        alt2View.backgroundColor = UIColor.lightGray
+        alt3View.backgroundColor = customGray
+        alt4View.backgroundColor = customGray
+    }
+    
+    @objc func onTapAlt3View() {
+        altSelected = 3
+        alt1View.backgroundColor = customGray
+        alt2View.backgroundColor = customGray
+        alt3View.backgroundColor = UIColor.lightGray
+        alt4View.backgroundColor = customGray
+    }
+    
+    @objc func onTapAlt4View() {
+        altSelected = 4
+        alt1View.backgroundColor = customGray
+        alt2View.backgroundColor = customGray
+        alt3View.backgroundColor = customGray
+        alt4View.backgroundColor = UIColor.lightGray
+    }
+    
+    @objc func onTapEliminarAltsView() {
+        let storyBoard = UIStoryboard(name: "Main", bundle: .main)
+        let vc = storyBoard.instantiateViewController(withIdentifier: "EliminarAltsVC") as! EliminarAltsVC
+        vc.delegate = self
+        present(vc, animated: true)
+    }
+    
+    @objc func onTapUniversitariosView() {
+        let storyBoard = UIStoryboard(name: "Main", bundle: .main)
+        let vc = storyBoard.instantiateViewController(withIdentifier: "UniversitariosVC") as! UniversitariosVC
+        if let pergunta = self.pergunta {
+            vc.pergunta = pergunta
+        }
+        vc.delegate = self
+        present(vc, animated: true)
+    }
 
 }
 
+// MARK: - Protocols
+
+extension QuizVC: EliminarAltsVCDelegate, UniversitariosVCDelegate {
+    
+    func clicouMostrarRespostas() {
+        universitariosView.backgroundColor = .systemGray
+        universitariosImageView.image = UIImage(named: "graduation_disabled")
+        
+        universitariosView.isUserInteractionEnabled = false
+    }
+    
+    func getQntAltsEliminadas(qntAltsEliminadas: Int) {
+        self.qntAltsEliminadas = qntAltsEliminadas
+        
+        eliminarAltsView.backgroundColor = .systemGray
+        eliminarAltsImageView.image = UIImage(named: "forbidden_disabled")
+        
+        eliminarAltsView.isUserInteractionEnabled = false
+        
+        if qntAltsEliminadas == 0 {
+            return
+        }
+        
+        var altsQuePodemSerEliminadas: [Int] = []
+        
+        for i in 1...4 {
+            if i != altCorreta {
+                altsQuePodemSerEliminadas.append(i)
+            }
+        }
+        
+        for _ in 0..<qntAltsEliminadas {
+            let altEliminada = altsQuePodemSerEliminadas.randomElement() ?? 0
+            altsQuePodemSerEliminadas = altsQuePodemSerEliminadas.filter { $0 != altEliminada }
+            eliminateAlt(alt: altEliminada)
+        }
+        
+    }
+    
+    func eliminateAlt(alt: Int) {
+        if alt == 1 {
+            alt1View.isHidden = true
+        } else if alt == 2 {
+            alt2View.isHidden = true
+        } else if alt == 3 {
+            alt3View.isHidden = true
+        } else if alt == 4 {
+            alt4View.isHidden = true
+        }
+    }
+    
+}
